@@ -63,6 +63,8 @@ func main() {
 
                 isPortraitImage := height >= width
 
+                // resize the image if it is bigger than the page at a given dpi
+
                 if isPortraitImage {
 
                     if height > totalVerticalPixels {
@@ -82,6 +84,7 @@ func main() {
                     }
                 }
                 
+                // figure out margins
                 widthDifferenceInPixels := totalHorizontalPixels - width
                 heightDifferenceInPixels := totalVerticalPixels - height
 
@@ -96,7 +99,7 @@ func main() {
                     yMargin = heightDifferenceInPixels / 2.0
                 }
 
-                // okay, cool, we have our margins, so now try to render the pdf page
+                // okay, cool, we have our margins and the proper image dimensions, so now try to render the pdf page
                 
                 pdf.AddPage()
                 pdf.Image(args[i], xMargin, yMargin, width, height, false, "", 0, "")
