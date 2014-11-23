@@ -12,6 +12,12 @@ import (
     _ "image/png"
 )
 
+func pixelsToMM(pixelValue float64, dpi int) float64{
+    millimetersPerInch := 25.4
+
+    return pixelValue * (millimetersPerInch/ float64(dpi))
+}
+
 func main() {
     var args = os.Args[1:]
 
@@ -19,6 +25,7 @@ func main() {
 
     pageWidth := 8.5
     pageHeight := 11.0
+    dpi := 200
 
     if numArgs == 0 {
     	fmt.Println("Invalid usage: Missing arguments")
@@ -56,12 +63,10 @@ func main() {
                 height := float64(im.Height)
                 width := float64(im.Width)
 
-                dpi := 96.0
-
                 fmt.Printf("Image Height: %f   Image Width: %f\n", height, width)
 
-                totalHorizontalPixels := dpi * pageWidth
-                totalVerticalPixels := dpi * pageHeight
+                totalHorizontalPixels := float64(dpi) * pageWidth
+                totalVerticalPixels := float64(dpi) * pageHeight
 
                 fmt.Printf("totalHorizontalPixels: %f   totalVerticalPixels: %f\n", totalHorizontalPixels, totalVerticalPixels)
 
@@ -110,16 +115,23 @@ func main() {
                     yMargin = heightDifferenceInPixels / 2.0
                 }
 
-                // okay, cool, we have our margins and the proper image dimensions, so now try to render the pdf page
-                _ = xMargin
-                _ = yMargin
-
                 fmt.Printf("xMargin: %f   yMargin: %f\n", xMargin, yMargin )
+
+                // convert values to mm, since that's what gofpdf is using
+
+                xMarginMM := pixelsToMM(xMargin, dpi)
+                yMarginMM := pixelsToMM(yMargin, dpi)
+                widthMM := pixelsToMM(width, dpi)
+                heightMM := pixelsToMM(height, dpi)
+
+                fmt.Printf("Converting values from pixels to MM \n")
+
+                fmt.Printf("xMarginMM: %f   yMarginMM: %f   widthMM: %f   heightMM: %f   \n", xMarginMM, yMarginMM, widthMM, heightMM )
 
                 fmt.Printf("Adding Image to Page ...\n")
 
                 pdf.AddPage()
-                pdf.Image(args[i], 0, 0, 200, 0, false, "", 0, "")
+                pdf.Image(args[i], xMarginMM, yMarginMM, widthMM, heightMM, false, "", 0, "")
 
                 fmt.Printf("Adding Image to Page ... DONE\n")
                 
